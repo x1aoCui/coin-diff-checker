@@ -13,6 +13,9 @@ app.use(cors())
 app.use(morgan('tiny'))
 app.use(bodyParser.json())
 
+// in latest body-parser use like below.
+app.use(bodyParser.urlencoded({ extended: true }));
+
 mongoose
     .connect(mongoUrl, {
         // useNewUrlParser: true,

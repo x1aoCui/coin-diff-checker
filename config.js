@@ -6,7 +6,7 @@
 module.exports = {
     mongoUrl: process.env.MONGO_URI||"mongodb://localhost:27017",
     PORT: process.env.PORT || 3000,
-    photoUrl: 'C:\\Users\\cuixi\\Desktop'
+    photoUrl: 'C:\\Users\\cuixi\\Desktop\\testfile'
 }
 
 //memo https://serversideup.net/uploading-files-vuejs-axios/
