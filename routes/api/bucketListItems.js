@@ -19,7 +19,20 @@ const storage = multer.diskStorage({
 const upload = multer({storage: storage});
 
 
-router.get('/', async (req, res) => {
+// router.get('/', async (req, res) => {
+//     try {
+//         const bucketListItems = await BucketListItem.find()
+//         if (!bucketListItems) throw new Error('No bucketListItems')
+//         const sorted = bucketListItems.sort((a, b) => {
+//             return new Date(a.date).getTime() - new Date(b.date).getTime()
+//         })
+//         res.status(200).json(sorted)
+//     } catch (error) {
+//         res.status(500).json({ message: error.message })
+//     }
+// })
+
+router.get('/getphoto', async (req, res) => {
     try {
         const bucketListItems = await BucketListItem.find()
         if (!bucketListItems) throw new Error('No bucketListItems')
@@ -27,6 +40,7 @@ router.get('/', async (req, res) => {
             return new Date(a.date).getTime() - new Date(b.date).getTime()
         })
         res.status(200).json(sorted)
+
     } catch (error) {
         res.status(500).json({ message: error.message })
     }
@@ -37,18 +51,15 @@ router.post('/uploadphoto', async (req, res) => {
     const form = new multiparty.Form();
     form.parse(req, function(err, fields, files) {
         Object.keys(files).forEach(async function(name) {
-
             /*console.log(files[name][0].path);*/
                 let img = fs.readFileSync(files[name][0].path);
-
-    let encode_image = img.toString('base64');
+                let encode_image = img.toString('base64');
                 let finalImg = {
                     description:name,
                     date: Date.now(),
                     img: {data:Buffer.from(encode_image.toString('base64'), 'base64'),contentType: String}
                 };
                 const newBucketListItem = new BucketListItem(finalImg)
-
     try {
         const bucketListItem = await newBucketListItem.save()
 
