@@ -18,20 +18,6 @@ const storage = multer.diskStorage({
 
 const upload = multer({storage: storage});
 
-
-// router.get('/', async (req, res) => {
-//     try {
-//         const bucketListItems = await BucketListItem.find()
-//         if (!bucketListItems) throw new Error('No bucketListItems')
-//         const sorted = bucketListItems.sort((a, b) => {
-//             return new Date(a.date).getTime() - new Date(b.date).getTime()
-//         })
-//         res.status(200).json(sorted)
-//     } catch (error) {
-//         res.status(500).json({ message: error.message })
-//     }
-// })
-
 router.get('/getphoto', async (req, res) => {
     try {
         const bucketListItems = await BucketListItem.find()
@@ -138,4 +124,16 @@ router.delete('/:id', async (req, res) => {
 //     }
 // })
 
+// router.get('/', async (req, res) => {
+//     try {
+//         const bucketListItems = await BucketListItem.find()
+//         if (!bucketListItems) throw new Error('No bucketListItems')
+//         const sorted = bucketListItems.sort((a, b) => {
+//             return new Date(a.date).getTime() - new Date(b.date).getTime()
+//         })
+//         res.status(200).json(sorted)
+//     } catch (error) {
+//         res.status(500).json({ message: error.message })
+//     }
+// })
 module.exports = router
