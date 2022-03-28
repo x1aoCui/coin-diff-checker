@@ -1,4 +1,5 @@
 const { Schema, model } = require('mongoose')
+const mongoose = require("mongoose");
 //data type? with photo
 const BucketListItemSchema = new Schema({
     description: {
@@ -12,6 +13,9 @@ const BucketListItemSchema = new Schema({
     date: {
         type: Date,
         default: Date.now
+    },
+    value:{
+        type:String
     }
 })
 

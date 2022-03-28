@@ -3,10 +3,10 @@ const BucketListItem = require('../../models/BukectListItem')
 const multer = require('multer');
 const { photoUrl } = require('../../config')
 fs = require('fs-extra')
+const Resemblejs = require('resemblejs')
 const router = Router()
 const multiparty = require('multiparty');
 
-const util = require('util');
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, photoUrl)
@@ -17,6 +17,7 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({storage: storage});
+var loadedPhotoList = [];
 
 router.get('/getphoto', async (req, res) => {
     try {
@@ -25,11 +26,37 @@ router.get('/getphoto', async (req, res) => {
         const sorted = bucketListItems.sort((a, b) => {
             return new Date(a.date).getTime() - new Date(b.date).getTime()
         })
+        loadedPhotoList = bucketListItems
+        // console.log(loadedPhotoList[0]._id.toString())
         res.status(200).json(sorted)
 
     } catch (error) {
         res.status(500).json({ message: error.message })
     }
+})
+
+router.post('/compareCoin', async (req, res) => {
+    let form = new multiparty.Form();
+    let resultList = [];
+    form.parse(req, function(err, fields, files) {
+        Object.keys(files).forEach(async function(name) {
+            /*console.log(files[name][0].path);*/
+            let img = fs.readFileSync(files[name][0].path);
+            let encode_image = img.toString('base64');
+              for(let i = 0; i<loadedPhotoList.length;i++){
+                Resemblejs(returnBase64Photos(encode_image))
+                    .compareTo(returnBase64Photos(_arrayBufferToBase64(loadedPhotoList[i].img.data)))
+                    .ignoreColors()
+                    .onComplete(function (data) {
+                      resultList.push((100-data.rawMisMatchPercentage)/100)
+
+                    });
+              }
+            res.send(resultList)
+        });
+
+    });
+
 })
 
 router.post('/uploadphoto', async (req, res) => {
@@ -43,7 +70,8 @@ router.post('/uploadphoto', async (req, res) => {
                 let finalImg = {
                     description:name,
                     date: Date.now(),
-                    img: {data:Buffer.from(encode_image.toString('base64'), 'base64'),contentType: String}
+                    img: {data:Buffer.from(encode_image.toString('base64'), 'base64'),contentType: String},
+                    value:files[name].value
                 };
                 const newBucketListItem = new BucketListItem(finalImg)
     try {
@@ -59,17 +87,6 @@ router.post('/uploadphoto', async (req, res) => {
 
     });
 
-    // for (let key of req.body.formData.entries()) {
-    //     console.log(key[0] + ', ' + key[1])
-    // }
-    // const newBucketListItem = new BucketListItem(req.body)
-    // try {
-    //     const bucketListItem = await newBucketListItem.save()
-    //     if (!bucketListItem) throw new Error('Something went wrong saving the bucketListItem')
-    //     res.status(200).json(bucketListItem)
-    // } catch (error) {
-    //     res.status(500).json({ message: error.message })
-    // }
 })
 
 router.put('/:id', async (req, res) => {
@@ -96,44 +113,17 @@ router.delete('/:id', async (req, res) => {
     }
 })
 
-//Uploading multiple files
-// router.post('/uploadphoto', async (req, res) => {
-//
-//     // let img = fs.readFileSync(req.file.path);
-//     console.log(req.body)
-//     console.log(req.data)
-//     let encode_image = req.data.toString('base64');
-//
-//     // Define a JSONobject for the image attributes for saving to database
-//     let finalImg = {
-//         description:"test photo11",
-//         date: Date.now(),
-//         img: {data:Buffer.from(encode_image, 'base64'),contentType: String}
-//     };
-//
-//
-//     const newBucketListItem = new BucketListItem(finalImg)
-//
-//     try {
-//         const bucketListItem = await newBucketListItem.save()
-//
-//         if (!bucketListItem) throw new Error('Something went wrong saving the bucketListItem')
-//         res.status(200).json(bucketListItem)
-//     } catch (error) {
-//         res.status(500).json({ message: error.message })
-//     }
-// })
+const returnBase64Photos = (photoBase64Data) =>{
+    return `data:image/jpeg;base64,${photoBase64Data}`
+}
 
-// router.get('/', async (req, res) => {
-//     try {
-//         const bucketListItems = await BucketListItem.find()
-//         if (!bucketListItems) throw new Error('No bucketListItems')
-//         const sorted = bucketListItems.sort((a, b) => {
-//             return new Date(a.date).getTime() - new Date(b.date).getTime()
-//         })
-//         res.status(200).json(sorted)
-//     } catch (error) {
-//         res.status(500).json({ message: error.message })
-//     }
-// })
+const _arrayBufferToBase64 = (buffer) => {
+    let binary = '';
+    let bytes = new Uint8Array( buffer );
+    let len = bytes.byteLength;
+    for (let i = 0; i < len; i++) {
+        binary += String.fromCharCode( bytes[ i ] );
+    }
+    return btoa( binary );
+}
 module.exports = router
