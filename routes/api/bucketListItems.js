@@ -1,24 +1,52 @@
 const { Router } = require('express')
 const BucketListItem = require('../../models/BukectListItem')
-const multer = require('multer');
-const { photoUrl } = require('../../config')
+const ListNavItem = require('../../models/ListNavItem')
+
 fs = require('fs-extra')
 const Resemblejs = require('resemblejs')
 const router = Router()
 const multiparty = require('multiparty');
 
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, photoUrl)
-    },
-    filename: function (req, file, cb) {
-        cb(null, file.fieldname + '-' + Date.now())
-    }
-});
 
-const upload = multer({storage: storage});
 var loadedPhotoList = [];
 
+//json part
+router.get('/getlistnav', async (req, res) => {
+    try {
+        console.log("inside")
+        const listNavItems = await ListNavItem.find()
+        if (!listNavItems) console.log('No listNavItems')
+        const sorted = listNavItems.sort((a, b) => {
+            return new Date(a.date).getTime() - new Date(b.date).getTime()
+        })
+
+        // console.log(loadedPhotoList[0]._id.toString())
+        res.status(200).json(sorted)
+
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+})
+router.post('/uploadlistnav', async (req, res) => {
+    console.log(req.body)
+    await ListNavItem.replaceOne({id:req.body.id}, req.body);
+})
+
+router.post('/addlistnav', async (req, res) => {
+    const newListNavItem = new ListNavItem(req.body)
+    try {
+        const listNavItem = await newListNavItem.save()
+
+        if (!listNavItem) throw new Error('Something went wrong saving the listNavItem')
+        //res.status(200).json(bucketListItem)
+    } catch (error) {
+        //res.status(500).json({ message: error.message })
+    }
+})
+
+
+
+//coin part
 router.get('/getphoto', async (req, res) => {
     try {
         const bucketListItems = await BucketListItem.find()

@@ -1,5 +1,4 @@
 const { Schema, model } = require('mongoose')
-const mongoose = require("mongoose");
 //data type? with photo
 const BucketListItemSchema = new Schema({
     description: {
