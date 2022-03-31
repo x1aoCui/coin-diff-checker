@@ -13,7 +13,7 @@ const BucketListItemSchema = new Schema({
         type: Date,
         default: Date.now
     },
-    value:{
+    dictIndex:{
         type:String
     }
 })

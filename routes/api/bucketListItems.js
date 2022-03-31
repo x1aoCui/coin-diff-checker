@@ -13,7 +13,7 @@ var loadedPhotoList = [];
 //json part
 router.get('/getlistnav', async (req, res) => {
     try {
-        console.log("inside")
+
         const listNavItems = await ListNavItem.find()
         if (!listNavItems) console.log('No listNavItems')
         const sorted = listNavItems.sort((a, b) => {
@@ -28,7 +28,7 @@ router.get('/getlistnav', async (req, res) => {
     }
 })
 router.post('/uploadlistnav', async (req, res) => {
-    console.log(req.body)
+
     await ListNavItem.replaceOne({id:req.body.id}, req.body);
 })
 
@@ -47,13 +47,15 @@ router.post('/addlistnav', async (req, res) => {
 
 
 //coin part
-router.get('/getphoto', async (req, res) => {
+router.post('/getphoto', async (req, res) => {
     try {
-        const bucketListItems = await BucketListItem.find()
+
+        const bucketListItems = await BucketListItem.find({dictIndex:req.body["dictIndex"]})
         if (!bucketListItems) throw new Error('No bucketListItems')
         const sorted = bucketListItems.sort((a, b) => {
             return new Date(a.date).getTime() - new Date(b.date).getTime()
         })
+
         loadedPhotoList = bucketListItems
         // console.log(loadedPhotoList[0]._id.toString())
         res.status(200).json(sorted)
@@ -92,6 +94,7 @@ router.post('/uploadphoto', async (req, res) => {
     const form = new multiparty.Form();
     form.parse(req, function(err, fields, files) {
         Object.keys(files).forEach(async function(name) {
+            console.log(fields["key_index"])
             /*console.log(files[name][0].path);*/
                 let img = fs.readFileSync(files[name][0].path);
                 let encode_image = img.toString('base64');
@@ -99,7 +102,7 @@ router.post('/uploadphoto', async (req, res) => {
                     description:name,
                     date: Date.now(),
                     img: {data:Buffer.from(encode_image.toString('base64'), 'base64'),contentType: String},
-                    value:files[name].value
+                    dictIndex:fields["key_index"].toString()
                 };
                 const newBucketListItem = new BucketListItem(finalImg)
     try {
