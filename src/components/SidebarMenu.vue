@@ -32,12 +32,13 @@
             :index=insideItem.id.toString()
             @click="loadPhoto">
           {{ insideItem.name }}
+          <el-button style="float: right;" class="el-button--info" >delete</el-button>
         </el-menu-item>
       </div>
 
         <el-menu-item :index=item.id.toString()
                       @click="addCoinValue">
-                      <el-icon :size="20">
+                      <el-icon :size="12">
                         <Plus />
                       </el-icon>
                       add-coin-value

@@ -12,51 +12,13 @@
     <el-container>
       <!-- 顶部 -->
       <el-header  height="150px">
-<!--        <el-upload action="#" list-type="picture-card" :auto-upload="false">-->
-<!--          <el-icon><Plus /></el-icon>-->
-
-<!--          <template #file="{ file }">-->
-<!--            <div>-->
-<!--              <img class="el-upload-list__item-thumbnail" :src="file.url" alt="" />-->
-<!--              <span class="el-upload-list__item-actions">-->
-<!--          <span-->
-<!--              class="el-upload-list__item-preview"-->
-<!--              @click="handlePictureCardPreview(file)"-->
-<!--          >-->
-<!--            <el-icon><zoom-in /></el-icon>-->
-<!--          </span>-->
-
-<!--          <span-->
-<!--              v-if="!disabled"-->
-<!--              class="el-upload-list__item-delete"-->
-<!--              @click="handleRemove(file)"-->
-<!--          >-->
-<!--            <el-icon><Delete /></el-icon>-->
-<!--          </span>-->
-<!--        </span>-->
-<!--            </div>-->
-<!--          </template>-->
-<!--        </el-upload>-->
-
-        <el-col :span="4">
-            <input type="file" name="file" ref="file" multiple v-on:change="handleFileUpload($event)" enctype="multipart/form-data" />
-            <el-image
-              style="width: 100px; height: 100px"
-              v-if="photoPreview"
-              :src ="photoPreview"
-              fit="cover"
-            />
-          <br/>
-
-        </el-col>
-        <button v-on:click="submitFile()">Submit</button>
-        <button v-on:click="compareAllCoins()">Compare</button>
-        <el-col :span="20">
-
-        </el-col>
+        <UploadHeader
+            :dict-index="dictIndex"
+            @updateCoinDiffList = "updateDiffList"
+        />
       </el-header>
       <!-- 主页面 -->
-      <el-main> Your localtion :{{ dictIndex }}
+      <el-main> Your localtion :{{ dictPath }}
         <el-row >
           <coin-detail
               :photos=photos
@@ -79,58 +41,55 @@
 import {ref} from "@vue/reactivity";
 import {onMounted, reactive} from "vue";
 import axios from "axios";
-import FormData from 'form-data'
 import CoinDetail from "@/components/CoinDetail";
 import SidebarMenu from "@/components/SidebarMenu";
+import {Plus} from "@element-plus/icons-vue";
+import UploadHeader from "@/components/UploadHeader";
+import {useStore} from "vuex";
+
 
 
 export default {
   name: 'HomeView',
-  components: {SidebarMenu, CoinDetail},
+  components: {SidebarMenu, CoinDetail,Plus,UploadHeader},
   setup(){
-    const diffList = ref([])
+
     const photos = ref([])
-    const files = ref([])
-    const photoPreview= ref("")
+    const diffList = ref([])
     const dictIndex = ref("")
+    const dictPath = ref('')
+    const store = useStore()
 
     // mongodb part
     onMounted( async ()=>{
       // const res = await axios.get("http://localhost:3000/api/bucketListItems/");
       // items.value = res.data;
       // console.log(items.value)
-
     })
-    const compareAllCoins = async () =>{
-      diffList.value = []
 
-      //compute in the backend
-      let formData = new FormData();
-      formData.append(files.value[0].name, files.value[0]);
-      const res = await axios.post("http://localhost:3000/api/bucketListItems/compareCoin",
-          formData,
-          {
-            mode: 'cors',
-            headers: {
-              'Content-Type': 'multipart/form-data',
+    const updateDiffList = (data) => {
+      diffList.value = data
+    }
+
+    const getLocation = (dictIndex) =>{
+      let listNav = store.state.listNav
+
+
+      for(let i =0;i<listNav.length;i++){
+        if(listNav[i].item.length>0){
+          for(let j=0;j<listNav[i].item.length;j++){
+            if(listNav[i].item[j].id==dictIndex){
+              dictPath.value = `${listNav[i].name} \/ ${listNav[i].item[j].name}`
             }
           }
-      )
-      diffList.value = res.data
-    }
-    const handleFileUpload = (event) =>{
-      console.log("changed")
-      files.value = []
-      let uploadedFiles = event.target.files;
-      for( let i = 0; i < uploadedFiles.length; i++ ){
-        files.value.push( uploadedFiles[i] );
-      }
-      //photo preview part
-      photoPreview.value = URL.createObjectURL(files.value[0])
+        }
 
+      }
     }
+
     const getPhotos = async(dictIndex)=> {
       console.log(dictIndex)
+      getLocation(dictIndex)
       //clear temp lists, later use a function to clean all
       diffList.value = []
       photos.value = []
@@ -146,41 +105,9 @@ export default {
         })
       }
     }
-
-    const submitFile=async ()=>{
-      if (dictIndex.value.length!=0&&files.value.length!=0){
-
-        const formData = new FormData();
-        for( let i = 0; i < files.value.length; i++ ){
-          let file = files.value[i];
-          formData.append(file.name, file);
-        }
-        formData.append("key_index",dictIndex.value)
-        console.log(formData)
-        files.value = []
-        await axios.post( 'http://localhost:3000/api/bucketListItems/uploadphoto',
-            formData,
-            {
-
-              headers: {
-                'Content-Type': 'multipart/form-data',
-              }
-            }
-        ).then(function(){
-          console.log('SUCCESS!!');
-        })
-            .catch(function(){
-              console.log('FAILURE!!');
-            });
-      }
-
-    }
-
-
     //以后用for绑定多个
     //判断文件夹的index来检索数据库数据
     const loadphoto = (keyIndex) => {
-
         dictIndex.value = keyIndex
         getPhotos(dictIndex.value)
     }
@@ -201,12 +128,12 @@ export default {
 
     const callRefresh=async ()=>{
       await getPhotos(dictIndex.value)
+
     }
 
     return{
-      handleFileUpload,
-      submitFile,files,loadphoto,photos,compareAllCoins,diffList,
-      photoPreview,callRefresh,dictIndex
+      loadphoto,photos,diffList,
+      callRefresh,dictIndex,updateDiffList,getLocation,dictPath
     }
   }
 
