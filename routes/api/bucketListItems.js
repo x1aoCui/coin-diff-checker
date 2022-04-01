@@ -49,7 +49,6 @@ router.post('/addlistnav', async (req, res) => {
 //coin part
 router.post('/getphoto', async (req, res) => {
     try {
-
         const bucketListItems = await BucketListItem.find({dictIndex:req.body["dictIndex"]})
         if (!bucketListItems) throw new Error('No bucketListItems')
         const sorted = bucketListItems.sort((a, b) => {
@@ -94,7 +93,7 @@ router.post('/uploadphoto', async (req, res) => {
     const form = new multiparty.Form();
     form.parse(req, function(err, fields, files) {
         Object.keys(files).forEach(async function(name) {
-            console.log(fields["key_index"])
+
             /*console.log(files[name][0].path);*/
                 let img = fs.readFileSync(files[name][0].path);
                 let encode_image = img.toString('base64');
@@ -122,7 +121,6 @@ router.post('/uploadphoto', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
     const { id } = req.params
-
     try {
         const response = await BucketListItem.findByIdAndUpdate(id, req.body)
         if (!response) throw Error('Something went wrong ')
