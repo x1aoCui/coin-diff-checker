@@ -30,6 +30,7 @@ router.get('/getlistnav', async (req, res) => {
 router.post('/uploadlistnav', async (req, res) => {
 
     await ListNavItem.replaceOne({id:req.body.id}, req.body);
+
 })
 
 router.post('/addlistnav', async (req, res) => {
@@ -108,7 +109,7 @@ router.post('/uploadphoto', async (req, res) => {
         const bucketListItem = await newBucketListItem.save()
 
         if (!bucketListItem) throw new Error('Something went wrong saving the bucketListItem')
-        //res.status(200).json(bucketListItem)
+        res.status(200).json({message:"success"})
     } catch (error) {
         //res.status(500).json({ message: error.message })
     }
