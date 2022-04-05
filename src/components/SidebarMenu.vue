@@ -25,17 +25,26 @@
       </template>
 
       <div v-if="item.item.length>0">
-
         <el-menu-item
             v-for="(insideItem,insideListIndex) in item.item"
             v-bind:key="insideListIndex"
             :index=insideItem.id.toString()
-            @click="loadPhoto">
+            @click="loadPhoto"
+            class="coin_value_item"
+
+        >
           {{ insideItem.name }}
-          <el-button style="float: right;" class="el-button--info" >delete</el-button>
+
+          <el-button type="primary"
+                     class="delete_coin_value"
+                     @click.stop="deleteCoinValue($event)"
+                     v-bind:id="insideItem.id.toString()">
+            <el-icon>
+              <Delete/>
+            </el-icon>
+          </el-button>
         </el-menu-item>
       </div>
-
         <el-menu-item :index=item.id.toString()
                       @click="addCoinValue">
                       <el-icon :size="12">
@@ -43,6 +52,12 @@
                       </el-icon>
                       add-coin-value
         </el-menu-item>
+      <el-menu-item :index=item.id.toString()
+                    @click="addCoinValue">
+                    <el-icon :size="12"><Delete /></el-icon>
+                    Delete-Coin_Type
+      </el-menu-item>
+
     </el-sub-menu>
     <el-menu-item v-if="listIndex==state.listNav.length-1" @click="dialogTypeFormVisible=true" >
       <el-icon><plus /></el-icon>
@@ -90,12 +105,13 @@
 import {ref} from "@vue/reactivity";
 import {reactive} from "vue";
 import {useStore} from "vuex";
-import {Plus} from '@element-plus/icons-vue'
+import {Plus,Delete} from '@element-plus/icons-vue'
+
 
 
 export default {
   name: "SidebarMenu",
-  components: {Plus},
+  components: {Plus,Delete},
   emits:["loadPhotos"],
   setup(props,{emit}){
     const store = useStore()
@@ -133,32 +149,40 @@ export default {
       typeForm.name = ''
     }
 
+    const deleteCoinValue=(e)=>{
+      console.log(e.currentTarget.id)
+
+    }
 
     const addCoinValue=(key)=>{
       dialogFormVisible.value= true
       form.id = key["index"]
     }
-    const submitCoinValue=()=>{
+    const submitCoinValue=async ()=>{
       console.log(form)
       let coinIdIndex = form.id;
+      let result ={}
       for(let i = 0;i<state.listNav.length;i++){
         if(state.listNav[i].id==coinIdIndex){
           console.log("coin value find")
-          let result ={
+          result ={
             coinIdIndex:coinIdIndex,
             id: createInt32Id().toString(),
             name: form.name
           }
-          store.commit('ADD_CoinValue',result)
+          await store.commit('ADD_CoinValue',result)
         }
       }
+
+      emit('loadPhotos',result.id)
       form.id=''
       form.name=''
       dialogFormVisible.value= false
+
     }
 
     return{
-      isCollapse,loadPhoto,state,
+      isCollapse,loadPhoto,state,deleteCoinValue,
       createInt32Id,addCoinValue,dialogFormVisible,form,
       formLabelWidth,submitCoinValue,
       dialogTypeFormVisible,typeForm,submitCoinType
@@ -167,6 +191,17 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+.coin_value_item{
+
+
+  .delete_coin_value{
+    height: 80%;
+    width: auto;
+    aspect-ratio: 1;
+    margin-left: auto;
+  }
+}
+
 
 </style>

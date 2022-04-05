@@ -32,12 +32,10 @@ export default {
   props:{
     dictIndex: String
   },
+  emits:["callRefreshBySubmit","updateCoinDiffList"],
   setup(props,{emit}){
     const files = ref([])
     const photoPreview= ref([])
-
-
-
     const handleFileUpload = (event) =>{
       files.value = []
       photoPreview.value = []
@@ -81,7 +79,7 @@ export default {
               }
             }
         ).then(function(){
-          console.log('SUCCESS!!');
+          emit("callRefreshBySubmit")
         })
             .catch(function(){
               console.log('FAILURE!!');

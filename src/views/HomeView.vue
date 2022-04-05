@@ -15,6 +15,7 @@
         <UploadHeader
             :dict-index="dictIndex"
             @updateCoinDiffList = "updateDiffList"
+            @callRefreshBySubmit = "callRefresh"
         />
       </el-header>
       <!-- 主页面 -->
@@ -127,9 +128,11 @@ export default {
     }
 
     const callRefresh=async ()=>{
+      console.log("called")
       await getPhotos(dictIndex.value)
 
     }
+
 
     return{
       loadphoto,photos,diffList,

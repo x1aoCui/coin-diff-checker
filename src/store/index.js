@@ -26,13 +26,15 @@ export default createStore({
           await axios.post( 'http://localhost:3000/api/bucketListItems/uploadlistnav',
               state.listNav[i],
           ).then(function(){
-            console.log('SUCCESS!!');
+            console.log('SUCCESS!!in state');
+
           })
               .catch(function(){
                 console.log('FAILURE!!');
               });
         }
       }
+
     },
     async ADD_CoinType(state, result) {
 
