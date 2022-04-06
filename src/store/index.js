@@ -1,6 +1,7 @@
 import { createStore } from 'vuex'
 import axios from "axios";
 
+
 export default createStore({
   state: {
     listNav:null
@@ -27,17 +28,41 @@ export default createStore({
               state.listNav[i],
           ).then(function(){
             console.log('SUCCESS!!in state');
-
           })
               .catch(function(){
                 console.log('FAILURE!!');
               });
         }
       }
+    },
+    async Delete_CoinValue(state, result) {
+      let dictIndex = result;
+      for (let i = 0; i < state.listNav.length; i++) {
+        let items = state.listNav[i].item
+        for(let j=0;j<items.length;j++){
+          if(items[j].id==dictIndex){
+            let index = items.indexOf(items[j])
+            items.splice(index,1)
+            //delete related coin pictures in db
+            await axios.delete("http://localhost:3000/api/bucketListItems/dictIndex/"+dictIndex);
+
+            //update listnav and just lazy use
+            await axios.post( 'http://localhost:3000/api/bucketListItems/uploadlistnav',
+                state.listNav[i],
+            ).then(function(){
+              console.log('SUCCESS!!in state');
+            })
+                .catch(function(){
+                  console.log('FAILURE!!');
+                });
+
+          }
+        }
+
+      }
 
     },
     async ADD_CoinType(state, result) {
-
       for (let i = 0; i < state.listNav.length; i++) {
         //check duplicate name
         if (state.listNav[i].name == result.name)  return false

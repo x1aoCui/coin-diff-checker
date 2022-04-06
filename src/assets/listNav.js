@@ -1,4 +1,4 @@
-
+//example structure
 export const listNavItems =[
 
         {

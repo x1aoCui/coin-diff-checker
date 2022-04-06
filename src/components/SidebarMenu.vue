@@ -24,7 +24,7 @@
         <span>{{item.name}}</span>
       </template>
 
-      <div v-if="item.item.length>0">
+      <div v-if="item.item.length>0" class="coin_value_div">
         <el-menu-item
             v-for="(insideItem,insideListIndex) in item.item"
             v-bind:key="insideListIndex"
@@ -35,7 +35,7 @@
         >
           {{ insideItem.name }}
 
-          <el-button type="primary"
+          <el-button type="text"
                      class="delete_coin_value"
                      @click.stop="deleteCoinValue($event)"
                      v-bind:id="insideItem.id.toString()">
@@ -98,6 +98,16 @@
     </template>
   </el-dialog>
 
+  <el-dialog v-model="deleteDialogFormVisible" title="DeleteCoinValue">
+    <span>It will remove the value dict and all related the coin pictures</span>
+    <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="deleteDialogFormVisible = false">Cancel</el-button>
+          <el-button type="primary" @click="submitDeleteCoinValue">Confirm</el-button>
+        </span>
+    </template>
+  </el-dialog>
+
 </template>
 
 <script >
@@ -112,11 +122,14 @@ import {Plus,Delete} from '@element-plus/icons-vue'
 export default {
   name: "SidebarMenu",
   components: {Plus,Delete},
-  emits:["loadPhotos"],
+  emits:["loadPhotos","emptyDict"],
   setup(props,{emit}){
     const store = useStore()
     const dialogFormVisible = ref(false)
     const dialogTypeFormVisible = ref(false)
+    const deleteDialogFormVisible = ref(false)
+    const deleteDictId = ref('')
+
     const form = reactive({
       name: '',
       id:''
@@ -150,9 +163,17 @@ export default {
     }
 
     const deleteCoinValue=(e)=>{
-      console.log(e.currentTarget.id)
+      deleteDictId.value = e.currentTarget.id
+      deleteDialogFormVisible.value = true
 
     }
+    const submitDeleteCoinValue = async () => {
+      await store.commit('Delete_CoinValue',deleteDictId.value)
+      emit('emptyDict')
+      deleteDialogFormVisible.value= false
+      deleteDictId.value = ''
+    }
+
 
     const addCoinValue=(key)=>{
       dialogFormVisible.value= true
@@ -182,8 +203,8 @@ export default {
     }
 
     return{
-      isCollapse,loadPhoto,state,deleteCoinValue,
-      createInt32Id,addCoinValue,dialogFormVisible,form,
+      isCollapse,loadPhoto,state,deleteCoinValue,deleteDialogFormVisible,
+      createInt32Id,addCoinValue,dialogFormVisible,form,submitDeleteCoinValue,
       formLabelWidth,submitCoinValue,
       dialogTypeFormVisible,typeForm,submitCoinType
     }
@@ -192,16 +213,21 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.coin_value_item{
-
-
-  .delete_coin_value{
-    height: 80%;
-    width: auto;
-    aspect-ratio: 1;
-    margin-left: auto;
+.coin_value_div{
+  .coin_value_item{
+    //overwrite ui default components attr
+    padding-left: 40px!important;
+    padding-right: 20px !important;
+    .delete_coin_value{
+      height: 80%;
+      width: auto;
+      aspect-ratio: 1;
+      margin-left: auto;
+    }
   }
 }
+
+
 
 
 </style>

@@ -7,6 +7,7 @@
   <!-- 侧边栏 -->
       <sidebar-menu
           @loadPhotos = "loadphoto"
+          @emptyDict = "cleanDictInfo"
       />
     </el-aside>
     <el-container>
@@ -27,7 +28,6 @@
               @callRefresh="callRefresh"
           />
         </el-row>
-
       </el-main>
     </el-container>
   </el-container>
@@ -74,8 +74,6 @@ export default {
 
     const getLocation = (dictIndex) =>{
       let listNav = store.state.listNav
-
-
       for(let i =0;i<listNav.length;i++){
         if(listNav[i].item.length>0){
           for(let j=0;j<listNav[i].item.length;j++){
@@ -132,10 +130,15 @@ export default {
       await getPhotos(dictIndex.value)
 
     }
+    const cleanDictInfo = () =>{
+      dictPath.value = ""
+      photos.value=[]
+
+    }
 
 
     return{
-      loadphoto,photos,diffList,
+      loadphoto,photos,diffList,cleanDictInfo,
       callRefresh,dictIndex,updateDiffList,getLocation,dictPath
     }
   }
