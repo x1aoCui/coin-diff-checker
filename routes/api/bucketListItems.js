@@ -132,6 +132,8 @@ router.put('/:id', async (req, res) => {
     }
 })
 
+
+
 router.delete('/:id', async (req, res) => {
     const { id } = req.params
     try {
@@ -142,6 +144,18 @@ router.delete('/:id', async (req, res) => {
         res.status(500).json({ message: error.message })
     }
 })
+
+router.delete('/dictIndex/:dictIndex', async (req, res) => {
+    const dictIndex  = req.params["dictIndex"]
+    try {
+        const removed = await BucketListItem.deleteMany({"dictIndex":dictIndex})
+        if (!removed) throw Error('Something went wrong ')
+        res.status(200).json(removed)
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+})
+
 
 const returnBase64Photos = (photoBase64Data) =>{
     return `data:image/jpeg;base64,${photoBase64Data}`
