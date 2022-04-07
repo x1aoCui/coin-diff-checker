@@ -1,24 +1,37 @@
-<template>
+<template xmlns:el-col="http://www.w3.org/1999/html">
     <el-col
         v-for="(item,index) in photos"
         v-bind:key="index"
         :span="4"
         ref = "diffList"
+        style="padding: 10px"
     >
-      <el-card :body-style="{ padding: '10px'}"  >
-        <el-image
-            style="width: 100px; height: 100px"
-            :src="item.data"
-            fit="cover"
-        />
-        <div style="padding: 0px">
-          <span>{{item.name}}</span><br />
-          <span v-if="diffList.length>0">Coin Symmetry: {{diffList[index]}}</span>
-          <div class="bottom">
-            <time class="time">{{ item.date }}</time><br />
-            <el-button type="text" class="button" @click="deleteCoin(item.id,index)">Delete</el-button>
+      <el-card :body-style="{ padding: '10px', height: '220px'}"  >
+        <el-row>
+          <el-col :span="12">
+            <el-image
+                style="width: 100px; height: 100px;"
+                :src="item.data"
+                fit="cover"
+            />
+          </el-col>
+          <el-col :span="12">
+            <div v-if="diffList.length>0" >
+              <el-row>Coin Symmetry:</el-row>
+              <el-row>{{diffList[index]}}</el-row>
+            </div>
+          </el-col>
+        </el-row>
+        <el-row>
+          <div style="padding: 0px">
+            <span>{{item.name}}</span><br />
+
+            <div class="bottom">
+              <time class="time">{{ item.date }}</time><br />
+              <el-button type="text" class="button" @click="deleteCoin(item.id,index)">Delete</el-button>
+            </div>
           </div>
-        </div>
+        </el-row>
       </el-card>
     </el-col>
 </template>
@@ -82,6 +95,9 @@ export default {
 .row-bg {
   padding: 10px 0;
   background-color: #f9fafc;
+}
+.bottom{
+  padding-bottom: 0px;
 }
 </style>
 

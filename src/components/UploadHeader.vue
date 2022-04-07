@@ -1,8 +1,8 @@
 <template>
   <el-row>
-    <el-button type="primary" @click="$refs.file.click()">Upload
+    <el-button type="primary" v-on:click="$refs.fileUploader.click()">Upload
         <el-icon  class="el-icon--right"><Upload /></el-icon>
-      <input  type="file" name="file" ref="file" multiple v-on:change="handleFileUpload($event)" enctype="multipart/form-data" style="display:none"/>
+      <input  type="file" name="file" ref="fileUploader" multiple v-on:change="handleFileUpload($event)" onclick="this.value=null" enctype="multipart/form-data" style="display:none" />
     </el-button>
     <el-button-group class="ml-4">
       <el-button v-on:click="submitFile()" :span="2">Submit</el-button>
@@ -37,6 +37,8 @@ export default {
   setup(props,{emit}){
     const files = ref([])
     const photoPreview= ref([])
+
+
     const handleFileUpload = (event) =>{
       files.value = []
       photoPreview.value = []

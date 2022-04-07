@@ -16,10 +16,12 @@
       :collapse="!isCollapse"
       v-for="(item,listIndex) in state.listNav"
       v-bind:key="listIndex"
+      :index="listIndex"
 
   >
     <el-sub-menu :index=listIndex.toString() >
       <template #title >
+<!--        can add coin icon later-->
         <el-icon>{{listIndex}}</el-icon>
         <span>{{item.name}}</span>
 <!--        <el-button type="text"-->
@@ -42,13 +44,14 @@
             class="coin_value_item"
 
         >
-          <el-tag class="ml-2" type="success" size="large">{{ insideItem.name }}</el-tag>
+          <el-tag class="ml-2" type="primary" size="large">{{ insideItem.name }}</el-tag>
 
 
           <el-button type="text"
                      class="delete_coin_value"
                      @click.stop="deleteCoinValue($event)"
-                     v-bind:id="insideItem.id.toString()">
+                     v-bind:id="insideItem.id.toString()"
+                     >
             <el-icon>
               <Delete/>
             </el-icon>
@@ -56,20 +59,22 @@
         </el-menu-item>
       </div>
         <el-menu-item :index=item.id.toString()
-                      @click="addCoinValue">
-          <el-button type="success"  plain>
+                      @click="addCoinValue"
+
+        >
+          <el-button type="success"  >
                       <el-icon :size="12">
                         <Plus />
                       </el-icon>
-                      add-coin-value
+            <div style="width: 100px">Add-coin-value</div>
           </el-button>
         </el-menu-item>
 
       <el-menu-item :index=item.id.toString()
-                    @click="deleteCoinType">
-                <el-button type="info"  plain>
+                    @click="deleteCoinType" >
+                <el-button type="info"  plain >
                   <el-icon><Delete/></el-icon>
-                  deletecointype
+                  <div style="width: 100px">Delete-coin-type</div>
                 </el-button>
 
 
@@ -77,17 +82,19 @@
 
     </el-sub-menu>
     <el-menu-item v-if="listIndex==state.listNav.length-1" @click="dialogTypeFormVisible=true" >
+      <el-button type="success"  plain style="width: 100%">
       <el-icon><plus /></el-icon>
-        <span>Add Coin Type</span>
+        <span v-if="isCollapse">Add Coin Type</span>
+      </el-button>
     </el-menu-item>
   </el-menu>
 
 
 
-<!-- for coinvalue type input-->
+<!-- for coin type input-->
   <el-dialog v-model="dialogFormVisible" title="AddNewCoinValue">
     <el-form :model="form">
-      <el-form-item label="Coin value type" :label-width="formLabelWidth">
+      <el-form-item label="Coin value type" :label-width="formLabelWidth" @keydown.enter.prevent="submitCoinValue">
         <el-input v-model="form.name" autocomplete="off" />
       </el-form-item>
 
@@ -101,7 +108,7 @@
   </el-dialog>
 
   <el-dialog v-model="dialogTypeFormVisible" title="AddNewCoinType">
-    <el-form :model="typeForm">
+    <el-form :model="typeForm" @keydown.enter.prevent="submitCoinType">
       <el-form-item label="Coin  type" :label-width="formLabelWidth">
         <el-input v-model="typeForm.name" autocomplete="off" />
       </el-form-item>
@@ -110,17 +117,18 @@
     <template #footer>
         <span class="dialog-footer">
           <el-button @click="dialogTypeFormVisible = false">Cancel</el-button>
+
           <el-button type="primary" @click="submitCoinType">Confirm</el-button>
         </span>
     </template>
   </el-dialog>
 
-  <el-dialog v-model="deleteDialogFormVisible" title="DeleteCoinValue">
+  <el-dialog v-model="deleteDialogFormVisible" title="DeleteCoinValue" width="25%">
     <span>It will remove the value dict and all related the coin pictures</span>
     <template #footer>
         <span class="dialog-footer">
           <el-button @click="deleteDialogFormVisible = false">Cancel</el-button>
-          <el-button type="primary" @click="submitDeleteCoinValue">Confirm</el-button>
+          <el-button type="primary" @click="submitDeleteCoinValue" @keydown.enter="submitDeleteCoinValue">Confirm</el-button>
         </span>
     </template>
   </el-dialog>
@@ -185,11 +193,9 @@ export default {
 
     }
 
-    const deleteCoinType=(key)=>{
-
-      console.log(key["index"])
-
-
+    const deleteCoinType=async (key)=>{
+      await store.commit('Delete_CoinType',key["index"])
+      emit('emptyDict')
     }
     const submitDeleteCoinValue = async () => {
       await store.commit('Delete_CoinValue',deleteDictId.value)
@@ -245,9 +251,10 @@ export default {
     padding-right: 20px !important;
     .delete_coin_value{
       height: 80%;
-      width: auto;
+      width: 0%;
       aspect-ratio: 1;
       margin-left: auto;
+      margin-right: 10px;
     }
   }
 }
