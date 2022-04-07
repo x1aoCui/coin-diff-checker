@@ -20,7 +20,7 @@
         />
       </el-header>
       <!-- 主页面 -->
-      <el-main> Your localtion :{{ dictPath }}
+      <el-main v-model="dictPath"> Your localtion :{{ dictPath }}
         <el-row >
           <coin-detail
               :photos=photos
@@ -40,13 +40,14 @@
 <script>
 /* eslint-disable */
 import {ref} from "@vue/reactivity";
-import {onMounted, reactive} from "vue";
+import {onMounted, reactive, watch, watchEffect} from "vue";
 import axios from "axios";
 import CoinDetail from "@/components/CoinDetail";
 import SidebarMenu from "@/components/SidebarMenu";
 import {Plus} from "@element-plus/icons-vue";
 import UploadHeader from "@/components/UploadHeader";
 import {useStore} from "vuex";
+import {ElNotification} from "element-plus";
 
 
 
@@ -66,6 +67,11 @@ export default {
       // const res = await axios.get("http://localhost:3000/api/bucketListItems/");
       // items.value = res.data;
       // console.log(items.value)
+      ElNotification({
+        title: 'Tip',
+        message: 'You should choose one dict',
+        type: 'info',
+      })
     })
 
     const updateDiffList = (data) => {
@@ -135,6 +141,17 @@ export default {
       photos.value=[]
 
     }
+
+    watch(dictPath,(dictPath,prevDictPath)=>{
+
+      if(dictPath==''){
+        ElNotification({
+          title: 'Info',
+          message: 'You should choose one dict',
+          type: 'info',
+        })
+      }
+    })
 
 
     return{

@@ -13,15 +13,24 @@
       v-else
       default-active="2"
       class="el-menu-vertical-demo"
-      :collapse="isCollapse"
+      :collapse="!isCollapse"
       v-for="(item,listIndex) in state.listNav"
       v-bind:key="listIndex"
 
   >
-    <el-sub-menu :index=listIndex.toString()>
-      <template #title>
+    <el-sub-menu :index=listIndex.toString() >
+      <template #title >
         <el-icon>{{listIndex}}</el-icon>
         <span>{{item.name}}</span>
+<!--        <el-button type="text"-->
+<!--                   class="delete_coin_button"-->
+<!--                   @click.stop="deleteCoinType($event)"-->
+<!--                   v-if="isCollapse"-->
+<!--                   >-->
+<!--          <el-icon>-->
+<!--            <Delete/>-->
+<!--          </el-icon>-->
+<!--        </el-button>-->
       </template>
 
       <div v-if="item.item.length>0" class="coin_value_div">
@@ -33,7 +42,8 @@
             class="coin_value_item"
 
         >
-          {{ insideItem.name }}
+          <el-tag class="ml-2" type="success" size="large">{{ insideItem.name }}</el-tag>
+
 
           <el-button type="text"
                      class="delete_coin_value"
@@ -47,15 +57,22 @@
       </div>
         <el-menu-item :index=item.id.toString()
                       @click="addCoinValue">
+          <el-button type="success"  plain>
                       <el-icon :size="12">
                         <Plus />
                       </el-icon>
                       add-coin-value
+          </el-button>
         </el-menu-item>
+
       <el-menu-item :index=item.id.toString()
-                    @click="addCoinValue">
-                    <el-icon :size="12"><Delete /></el-icon>
-                    Delete-Coin_Type
+                    @click="deleteCoinType">
+                <el-button type="info"  plain>
+                  <el-icon><Delete/></el-icon>
+                  deletecointype
+                </el-button>
+
+
       </el-menu-item>
 
     </el-sub-menu>
@@ -167,6 +184,13 @@ export default {
       deleteDialogFormVisible.value = true
 
     }
+
+    const deleteCoinType=(key)=>{
+
+      console.log(key["index"])
+
+
+    }
     const submitDeleteCoinValue = async () => {
       await store.commit('Delete_CoinValue',deleteDictId.value)
       emit('emptyDict')
@@ -205,7 +229,7 @@ export default {
     return{
       isCollapse,loadPhoto,state,deleteCoinValue,deleteDialogFormVisible,
       createInt32Id,addCoinValue,dialogFormVisible,form,submitDeleteCoinValue,
-      formLabelWidth,submitCoinValue,
+      formLabelWidth,submitCoinValue,deleteCoinType,
       dialogTypeFormVisible,typeForm,submitCoinType
     }
   }
@@ -214,6 +238,7 @@ export default {
 
 <style lang="scss" scoped>
 .coin_value_div{
+
   .coin_value_item{
     //overwrite ui default components attr
     padding-left: 40px!important;
@@ -226,7 +251,13 @@ export default {
     }
   }
 }
-
+.delete_coin_button{
+  padding-right: 30px!important;
+  height: 80%;
+  width: auto;
+  aspect-ratio: 1;
+  margin-left: auto;
+}
 
 
 

@@ -25,6 +25,7 @@ import FormData from "form-data";
 import axios from "axios";
 import {ref} from "@vue/reactivity";
 import {Upload} from "@element-plus/icons-vue";
+import {ElMessage} from "element-plus";
 
 export default {
   name: "UploadHeader",
@@ -79,6 +80,10 @@ export default {
               }
             }
         ).then(function(){
+          ElMessage({
+            message: 'Submit Success.',
+            type: 'success',
+          })
           emit("callRefreshBySubmit")
         })
             .catch(function(){
