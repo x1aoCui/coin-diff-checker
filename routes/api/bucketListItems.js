@@ -28,9 +28,7 @@ router.get('/getlistnav', async (req, res) => {
     }
 })
 router.post('/uploadlistnav', async (req, res) => {
-
     await ListNavItem.replaceOne({id:req.body.id}, req.body);
-
 })
 
 router.post('/addlistnav', async (req, res) => {
@@ -149,6 +147,17 @@ router.delete('/dictIndex/:dictIndex', async (req, res) => {
     const dictIndex  = req.params["dictIndex"]
     try {
         const removed = await BucketListItem.deleteMany({"dictIndex":dictIndex})
+        if (!removed) throw Error('Something went wrong ')
+        res.status(200).json(removed)
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+})
+
+router.delete('/listNav/:listNavIndex', async (req, res) => {
+    const listNavIndex  = req.params["listNavIndex"]
+    try {
+        const removed = await ListNavItem.deleteOne({"id":listNavIndex})
         if (!removed) throw Error('Something went wrong ')
         res.status(200).json(removed)
     } catch (error) {
