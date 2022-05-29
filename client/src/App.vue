@@ -2,12 +2,9 @@
   <div id="app">
     <nav>
       <div className="navigation__logo">
-        Twotter
+        Coin-Diff-Checker
       </div>
-      <div className="navigation__user" v-if="user">
-        {{ user.username }}
 
-      </div>
 
     </nav>
     <router-view></router-view>
