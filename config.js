@@ -9,5 +9,4 @@ module.exports = {
     photoUrl: 'C:\\Users\\cuixi\\Desktop\\testfile'
 }
 
-//memo https://serversideup.net/uploading-files-vuejs-axios/
-//id 改成文件夹id 存入mongodb
+
